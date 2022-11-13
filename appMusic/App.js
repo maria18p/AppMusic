@@ -1,23 +1,23 @@
 import React, { useState } from 'react';
 
 import { Text, View, TouchableOpacity, ActivityIndicator, TextInput, FlatList } from 'react-native';
+import { Item } from './components/View';
 import { styles } from './cssStyles/css';
 
 export default function App() {
   const [isLoading, setIsLoading] = useState(false);
-  const [searchName, setSearchName] = useState('');
-  const [results, setResults] = useState({});
+  const [searchName, setSearchName] = useState('characters');
+  const [results, setResults] = useState([]);
 
   const doSomething = async () => {
     setIsLoading(true);
-    const api = `https://itunes.apple.com/search?term=${searchName}`;
+    const api = `https://www.breakingbadapi.com/api/${searchName}`;
     const res = await fetch(api, {
       method: 'get',
     });
     const data = await res.json();
-    setResults(data.results);
+    setResults(data);
     setIsLoading(false);
-    console.log(data);
   };
 
   return (
@@ -31,7 +31,7 @@ export default function App() {
               paddingVertical: 10,
               paddingLeft: 10,
               backgroundColor: '#fff',
-              fontSize: 18,
+              fontSize: 14,
             }}
             value={searchName}
             onChangeText={(value) => {
@@ -54,18 +54,15 @@ export default function App() {
         </View>
       </View>
       <View style={{ width: '100%', height: '90%' }}>
-        {results.length > 0 ? (
+        {results ? (
           <FlatList
             data={results}
-            keyExtractor={(item) => item.trackId}
-            renderItem={(itemRow) => (
-              <View>
-                <Text>{itemRow.item.artistName}</Text>
-              </View>
-            )}
+            keyExtractor={(item) => item.char_id}
+            renderItem={({ item }) => <Item item={item} />}
+            // inverted
           />
         ) : (
-          <Text style={{ padding: 10 }}>No results</Text>
+          <Text>No results</Text>
         )}
       </View>
     </View>
